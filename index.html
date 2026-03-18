@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maple Apartments - Login</title>
+    <link rel="stylesheet" href="styles.css">
+
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <!-- Logo Area -->
+            <div class="logo-area">
+                <i class="fa-solid fa-leaf logo-icon"></i>
+            </div>
+
+            <div class="header-text">
+                <h1>Welcome to Maple Apartments</h1>
+                <p>Sign in to your apartment portal</p>
+            </div>
+
+            <!-- Error Message Box -->
+            <div class="error-message hidden" id="error-message">
+                <i class="fa-solid fa-circle-exclamation"></i>
+                <span id="error-text">Invalid login credentials. Please try again.</span>
+            </div>
+
+            <!-- Login Form -->
+            <form id="login-form">
+                <!-- User ID -->
+                <div class="input-group">
+                    <label for="username">User ID <span class="required">*</span></label>
+                    <div class="input-wrapper">
+                        <i class="fa-regular fa-user input-icon"></i>
+                        <input type="text" id="username" placeholder="Enter your User ID">
+                    </div>
+                </div>
+
+                <!-- Password -->
+                <div class="input-group">
+                    <label for="password">Password <span class="required">*</span></label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-lock input-icon"></i>
+                        <input type="password" id="password" placeholder="Enter your password">
+                        <!-- Password Masking Toggle -->
+                        <button type="button" class="toggle-password" id="togglePassword"
+                            aria-label="Toggle password visibility">
+                            <i class="fa-regular fa-eye" id="toggleIcon"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Forgot Password -->
+                <div class="form-actions">
+                    <a href="#" class="forgot-password">Forgot Password?</a>
+                </div>
+
+                <!-- Login Button -->
+                <button type="submit" class="submit-btn" id="loginBtn">
+                    <span>Login</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+
+
+            </form>
+
+            <!-- Register Link -->
+            <div class="card-footer" style="margin-top: 1.5rem;">
+                <p>Don't have an account? <a href="#" class="register-link">Register New Owner</a></p>
+            </div>
+        </div>
+
+        <!-- Page Footer -->
+        <footer class="page-footer">
+            <p>&copy; 2026 Maple Apartments. All Rights Reserved.</p>
+        </footer>
+    </div>
+
+
+    <script src="script.js"></script>
+</body>
+
+</html>

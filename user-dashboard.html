@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maple Apartments - Owner Dashboard</title>
+    <link rel="stylesheet" href="dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="brand">
+            <i class="fa-solid fa-leaf"></i> Maple Apts
+        </div>
+        <ul class="nav-links">
+            <li><a href="#" class="active"><i class="fa-solid fa-house-chimney"></i> Dashboard</a></li>
+            <li><a href="#"><i class="fa-solid fa-file-invoice-dollar"></i> Maintenance Bills</a></li>
+            <li><a href="#"><i class="fa-solid fa-building-columns"></i> Property Tax</a></li>
+            <li><a href="profile.html"><i class="fa-solid fa-user"></i> My Profile</a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <a href="index.html" class="logout-btn" onclick="sessionStorage.clear()"><i
+                    class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-wrapper">
+        <header class="header">
+            <h1 class="page-title">Owner Dashboard</h1>
+            <div class="user-profile">
+                <span style="font-weight: 500; color: #4b5563;" id="welcomeName">Loading...</span>
+                <div class="avatar" id="avatarInitial">U</div>
+            </div>
+        </header>
+
+        <section class="content">
+            <!-- Widgets -->
+            <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+                <div class="stat-card">
+                    <div class="stat-icon red">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                    </div>
+                    <div class="stat-info">
+                        <p>Total Unpaid</p>
+                        <h3 id="userTotalDue">₹0</h3>
+                    </div>
+                </div>
+                <!-- Additional summary cards could go here later if needed -->
+            </div>
+
+            <!-- Unified Dues Table -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h2 class="panel-title">My Pending Bills & Dues</h2>
+                    <button class="btn-primary">Pay All</button>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Bill Type</th>
+                            <th>Due Date</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="userBillsTable">
+                        <tr>
+                            <td colspan="4" style="text-align: center; color: #6b7280;">Loading bills...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </section>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const userStr = sessionStorage.getItem('maple_user');
+            if (userStr) {
+                const user = JSON.parse(userStr);
+                document.getElementById('welcomeName').textContent = `Flat ${user.flat_number} (${user.owner_name})`;
+                document.getElementById('avatarInitial').textContent = user.owner_name.charAt(0).toUpperCase();
+
+                // Fetch bills for this specific user
+                fetch(`/api/bills/${user.flat_number}`)
+                    .then(res => res.json())
+                    .then(bills => {
+                        const tbody = document.getElementById('userBillsTable');
+                        tbody.innerHTML = ''; // Clear loading message
+                        
+                        let totalDue = 0;
+                        if (bills.length === 0) {
+                            tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #6b7280;">No pending dues found.</td></tr>';
+                        } else {
+                            bills.forEach(bill => {
+                                if (bill.status === 'Unpaid') {
+                                    totalDue += bill.amount;
+                                    
+                                    const tr = document.createElement('tr');
+                                    tr.innerHTML = `
+                                        <td><strong>${bill.bill_type}</strong></td>
+                                        <td>${new Date(bill.due_date).toLocaleDateString()}</td>
+                                        <td>₹${bill.amount}</td>
+                                        <td><span class="badge ${bill.status === 'Paid' ? 'badge-paid' : 'badge-unpaid'}">${bill.status}</span></td>
+                                    `;
+                                    tbody.appendChild(tr);
+                                }
+                            });
+                        }
+                        
+                        document.getElementById('userTotalDue').textContent = `₹${totalDue}`;
+                    })
+                    .catch(err => {
+                        console.error('Error fetching user bills:', err);
+                        document.getElementById('userBillsTable').innerHTML = '<tr><td colspan="4" style="text-align: center; color: red;">Failed to load bills.</td></tr>';
+                    });
+
+            } else {
+                window.location.href = 'index.html'; // Redirect if not logged in
+            }
+        });
+    </script>
+</body>
+
+</html>

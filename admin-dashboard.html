@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maple Apartments - Admin Console</title>
+    <link rel="stylesheet" href="dashboard.css">
+
+    <!-- Admin-Specific Theme Overrides -->
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            /* Indigo Admin Theme */
+            --primary-hover: #4338ca;
+            --primary-light: #e0e7ff;
+        }
+
+        .stat-icon.blue {
+            background-color: #e0e7ff;
+            color: #4f46e5;
+        }
+    </style>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="brand">
+            <i class="fa-solid fa-crown" style="color: #f59e0b;"></i> Maple Admin
+        </div>
+        <ul class="nav-links">
+            <li><a href="#" class="active"><i class="fa-solid fa-chart-line"></i> Overview</a></li>
+            <li><a href="#"><i class="fa-solid fa-users"></i> Manage Residents</a></li>
+            <li><a href="#"><i class="fa-solid fa-file-invoice-dollar"></i> Generate Maint. Bills</a></li>
+            <li><a href="#"><i class="fa-solid fa-building-columns"></i> Property Tax Records</a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <a href="index.html" class="logout-btn" onclick="sessionStorage.clear()"><i
+                    class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-wrapper">
+        <header class="header">
+            <h1 class="page-title">Admin Control Panel</h1>
+            <div class="user-profile" style="display: flex; gap: 1rem; align-items: center;">
+                <button id="seedBillsBtn" class="btn-primary" style="background-color: #10b981;">
+                    <i class="fa-solid fa-seedling"></i> Seed Dummy Bills
+                </button>
+                <span class="badge badge-paid">System Admin</span>
+            </div>
+        </header>
+
+        <section class="content">
+            <!-- Navigation/Tabs for Billing vs generic -->
+            <div style="margin-bottom: 2rem;">
+                <h2 style="font-size: 1.5rem; color: #1f2937; margin-bottom: 1rem;">Apartment Billing Overview (All Flats)</h2>
+            </div>
+            
+            <!-- Widgets -->
+            <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+                <div class="stat-card">
+                    <div class="stat-icon blue">
+                        <i class="fa-solid fa-broom"></i>
+                    </div>
+                    <div class="stat-info">
+                        <p>Total Maintenance</p>
+                        <h3 id="totalMaint">$0</h3>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon green">
+                        <i class="fa-solid fa-building-columns"></i>
+                    </div>
+                    <div class="stat-info">
+                        <p>Property Tax</p>
+                        <h3 id="totalTax">$0</h3>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon orange">
+                        <i class="fa-solid fa-elevator"></i>
+                    </div>
+                    <div class="stat-info">
+                        <p>Lift & Parking</p>
+                        <h3 id="totalLift">$0</h3>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon red">
+                        <i class="fa-solid fa-holly-berry"></i>
+                    </div>
+                    <div class="stat-info">
+                        <p>Festive Contrib.</p>
+                        <h3 id="totalFestive">$0</h3>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background-color: #f3f4f6; color: #6b7280;">
+                        <i class="fa-solid fa-receipt"></i>
+                    </div>
+                    <div class="stat-info">
+                        <p>Others</p>
+                        <h3 id="totalOthers">$0</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Global Action Panel -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h2 class="panel-title">All Flat Residents</h2>
+                    <button class="btn-primary"><i class="fa-solid fa-plus"></i> Add New Resident</button>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Flat No.</th>
+                            <th>Owner Name</th>
+                            <th>Contact</th>
+                            <th>Ownership</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="adminUsersTable">
+                        <tr>
+                            <td colspan="5" style="text-align: center; color: #6b7280;">No residents loaded.</td>
+                        </tr>
+                        <!-- Dummy Row Example -->
+                        <tr>
+                            <td><strong>101</strong></td>
+                            <td>Test Owner</td>
+                            <td>9876543210</td>
+                            <td><span class="badge badge-paid">Owner</span></td>
+                            <td><a href="#" style="color: #4f46e5; font-weight: 500;">View Bills</a></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </section>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const userStr = sessionStorage.getItem('maple_user');
+            if (!userStr) {
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            const user = JSON.parse(userStr);
+            if (user.role !== 'Admin') {
+                alert('Unauthorized access! You are not an admin.');
+                window.location.href = 'user-dashboard.html';
+                return;
+            }
+
+            // Fetch and Aggregate all bills
+            fetch('/api/bills')
+                .then(res => res.json())
+                .then(bills => {
+                    let totals = {
+                        'Maintenance': 0,
+                        'Property Tax': 0,
+                        'Lift/Loading/Parking': 0,
+                        'Festive Contribution': 0,
+                        'Others': 0
+                    };
+
+                    bills.forEach(bill => {
+                        if (totals[bill.bill_type] !== undefined) {
+                            totals[bill.bill_type] += bill.amount;
+                        }
+                    });
+
+                    document.getElementById('totalMaint').textContent = `₹${totals['Maintenance']}`;
+                    document.getElementById('totalTax').textContent = `₹${totals['Property Tax']}`;
+                    document.getElementById('totalLift').textContent = `₹${totals['Lift/Loading/Parking']}`;
+                    document.getElementById('totalFestive').textContent = `₹${totals['Festive Contribution']}`;
+                    document.getElementById('totalOthers').textContent = `₹${totals['Others']}`;
+                })
+                .catch(err => console.error('Error fetching admin bills:', err));
+
+            // Seed Bills Action
+            document.getElementById('seedBillsBtn').addEventListener('click', () => {
+                const btn = document.getElementById('seedBillsBtn');
+                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Seeding...';
+                fetch('/api/bills/seed', { method: 'POST' })
+                    .then(res => res.json())
+                    .then(data => {
+                        alert(data.message);
+                        window.location.reload(); // Reload to fetch fresh data
+                    })
+                    .catch(err => {
+                        alert('Error seeding bills');
+                        console.error(err);
+                        btn.innerHTML = '<i class="fa-solid fa-seedling"></i> Seed Dummy Bills';
+                    });
+            });
+        });
+    </script>
+</body>
+
+</html>
